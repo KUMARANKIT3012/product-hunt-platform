@@ -10,6 +10,7 @@ import Modal from "../ui/modals/modal";
 import AuthContent from "./auth-content";
 import Avatar from "./avatar";
 import NotificationIcon from "./notification-icon";
+import Submit from "./submit";
 
 interface NavbarProps {
     authenticatedUser?: any
@@ -41,6 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center text-sm space-x-6 cursor-pointer">
                 {authenticatedUser ? (
                     <>
+                    <Submit />
                     <NotificationIcon />
                     <Avatar authenticatedUser={authenticatedUser} />
                     </>
