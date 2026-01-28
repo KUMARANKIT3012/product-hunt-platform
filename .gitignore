@@ -84,3 +84,23 @@ pids
 # Temporary folders
 tmp/
 temp/
+
+# Additional private files
+.env.backup
+.env.*.local
+auth.secret
+*.key
+*.pem
+*.p12
+*.pfx
+certificate.*
+private-key.*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Config files with sensitive data
+config/production.*
+config/staging.*

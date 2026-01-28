@@ -1,9 +1,24 @@
 "use client";
 
+import { ImagesUploader } from "@/components/image-uploader";
 import { LogoUploader } from "@/components/logo-uploader";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { Button } from "@/components/ui/button";
+
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { PiCalendar } from "react-icons/pi";
+
 
 const categories = [
   "Media",
@@ -39,15 +54,23 @@ const NewProduct = () => {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [headline, setHeadline] = useState("");
+
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [uploadedLogoUrl, setUploadedLogoUrl] = useState<string>("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [shortDescription, setShortDescription] = useState("");
+  const [uploadedProductImages, setUploadedProductImages] = 
+  useState<string[]>([]);
+  const handleProductImagesUpload = useCallback((urls: string[]) => {
+  setUploadedProductImages(urls);
+}, []);
+
 
   const handleNameChange = (e: any) => {
   const productName = e.target.value;
   const truncatedName = productName.slice(0, 30);
   setName(truncatedName);
-  const [uploadedProductImages, setUploadedProductImages] = useState<string[]>([]);
+  
 
   //create slug from product name
   const slugValue = truncatedName
@@ -260,6 +283,45 @@ return (
   </div>
 )}
 
+{step === 5 && (
+  <div className="space-y-10">
+    <h1 className="text-4xl font-semibold">
+      🗓️ Release Date
+    </h1>
+    <p className="text-xl font-light mt-4 leading-8">
+      When will your product be available to the public? Select a date to continue.
+    </p>
+    <div className="mt-10">
+              <div className="font-medium pb-3">Release date</div>
+              <>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[300px] pl-3 text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+
+                      <PiCalendar className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(date) => setDate(date)}
+                      initialFocus
+                      disabled={(date) => date < new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </>
+            </div>
+  </div>
+)}
 
 
 
