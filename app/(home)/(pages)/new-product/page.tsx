@@ -17,8 +17,11 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { PiCalendar, PiDiscordLogoFill, PiPlanet, PiTwitterLogoFill } from "react-icons/pi";
-// import { Separator } from "@/components/ui/separator";
+import { PiCalendar, PiDiscordLogoFill, PiPlanet, PiTwitterLogoFill, PiXCircleFill } from "react-icons/pi";
+import { createProduct } from "@/lib/server-actions";
+import { Separator } from "@/components/ui/separator";
+import {motion} from "framer-motion";
+import { toast } from "sonner";
 
 
 const categories = [
@@ -127,9 +130,158 @@ const NewProduct = () => {
   }, []);
 
 
-  const nextStep = useCallback(() => {
+const nextStep = useCallback(() => {
+    if (step === 1 && name.length < 4) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please enter at least 4 characters for the product name.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+
+      return;
+    }
+
+    if (step === 2 && selectedCategories.length < 3) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please select at least 3 categories for the product.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+
+    if (step === 3 && headline.length < 10) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please enter at least 10 characters for the headline.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+    if (step === 3 && shortDescription.length < 20) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please enter at least 20 characters for the short description.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+
+    if (step === 4 && !uploadedLogoUrl) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please upload a logo for the product.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+
+    if (step === 4 && uploadedProductImages.length < 1) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Upload at least 3 images for the product.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+
+    if (step === 5 && !date) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please select a release date or choose the Coming soon option.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+
+    if (step == 6 && !website && !twitter && !discord) {
+      toast(
+        <>
+          <div className="flex items-center gap-4  mx-auto">
+            <PiXCircleFill className="text-red-500 text-3xl" />
+            <div className="text-md font-semibold">
+              Please enter at least one link for the product.
+            </div>
+          </div>
+        </>,
+        {
+          position: "top-center",
+        }
+      );
+      return;
+    }
+
     setStep(step + 1);
-  }, [step]);
+  }, [
+    step,
+    name,
+    selectedCategories,
+    headline,
+    shortDescription,
+    uploadedLogoUrl,
+    uploadedProductImages,
+    date,
+    website,
+    twitter,
+    discord,
+  ]);
+
 
   const prevStep = useCallback(() => {
     setStep(step - 1);
@@ -171,7 +323,7 @@ const submitProduct = async () => {
     discord,
     description: shortDescription,
     logo: uploadedLogoUrl,
-    releasedDate: formattedDate,
+    releaseDate: formattedDate,
     images: uploadedProductImages,
     category: selectedCategories,
   });
@@ -187,7 +339,14 @@ return (
   <div className="flex items-center justify-center py-8 md:py-20">
   <div className="px-8 md:w-3/5 md:mx-auto">
     {step === 1 && (
-      <div className="space-y-10">
+      <motion.div 
+      initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+      animate={{ opacity: 1, x: 0 }}   // Slide to the center
+      exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+      transition={{ duration: 0.3 }}
+
+      
+      className="space-y-10">
         <h1 className="text-4xl font-semibold">📦 New product</h1>
         <p className="text-xl font-light mt-4 leading-8">
             Ready to showcase your product to the world?
@@ -221,10 +380,15 @@ return (
             readOnly
             />  
         </div>
-      </div>
+      </motion.div>
     )}
     {step === 2 && (
-        <div className="space-y-10">
+        <motion.div 
+        initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+        animate={{ opacity: 1, x: 0 }}   // Slide to the center
+        exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+        transition={{ duration: 0.3 }}
+        className="space-y-10">
             <h1 className="text-4xl font-semibold"> 
                 📊 What category does your product belong to?
             </h1>
@@ -236,10 +400,11 @@ return (
               <h2 className="font-medium">Select Categories</h2>
               <div className="grid grid-cols-4 gap-2 pt-4 items-center justify-center">
                 {categories.map((category, index) => (
-                  <div 
+                  <motion.div 
                   key={index} 
                   className="flex border rounded-full"
                   onClick={() => handleCategoryToggle(category)}
+                  whileTap={{scale: 0.9}}
                   >
                     <div
                       className={`text-xs md:text-sm p-2 cursor-pointer w-full text-center ${
@@ -250,16 +415,21 @@ return (
                     >
                       {category}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               
               </div>
             </div>
-        </div>
+        </motion.div>
     )}
 
     {step === 3 && (
-  <div className="space-y-10">
+  <motion.div 
+      initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+      animate={{ opacity: 1, x: 0 }}   // Slide to the center
+      exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+      transition={{ duration: 0.3 }}
+  className="space-y-10">
     <div className="text-4xl font-semibold">🧾 Product Details</div>
     <p className="text-xl font-light mt-4 leading-8">
       Provide a detailed description of your product to help users understand its features and benefits.
@@ -292,12 +462,17 @@ return (
         {shortDescription.length}/300
       </div>
     </div>
-  </div>
+  </motion.div>
 )}
 
 
 {step === 4 && (
-  <div className="space-y-10">
+  <motion.div 
+  initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+      animate={{ opacity: 1, x: 0 }}   // Slide to the center
+      exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+      transition={{ duration: 0.3 }}
+  className="space-y-10">
     <h1 className="text-4xl font-semibold">🖼️ Add images to showcase your product</h1>
     <p className="text-xl font-light mt-4 leading-8">
       High-quality images can significantly enhance the appeal of your product.
@@ -350,11 +525,18 @@ return (
                 />
               )}
             </div>
-  </div>
+  </motion.div>
 )}
 
 {step === 5 && (
-  <div className="space-y-10">
+  <motion.div 
+  
+  initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+      animate={{ opacity: 1, x: 0 }}   // Slide to the center
+      exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+      transition={{ duration: 0.3 }}
+  
+  className="space-y-10">
     <h1 className="text-4xl font-semibold">
       🗓️ Release Date
     </h1>
@@ -390,11 +572,17 @@ return (
                 </Popover>
               </>
             </div>
-  </div>
+  </motion.div>
 )}
 
 {step === 6 && (
-  <div className="space-y-10">
+  <motion.div 
+  initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+      animate={{ opacity: 1, x: 0 }}   // Slide to the center
+      exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+      transition={{ duration: 0.3 }}
+  
+  className="space-y-10">
     <h1 className="text-4xl font-semibold">Additional Links</h1>
     <p className="text-xl font-light mt-4 leading-8">
       Add links to your product&apos;s website, social media, and other platforms
@@ -445,11 +633,18 @@ return (
     />
   </div>
 
-  </div>
+  </motion.div>
 )}
 
 {step === 7 && (
-  <div className="space-y-10">
+  <motion.div 
+  
+  initial={{ opacity: 0, x: "100%" }} // Slide in from the right
+      animate={{ opacity: 1, x: 0 }}   // Slide to the center
+      exit={{ opacity: 0, x: "-100%" }}   // Slide out to the left
+      transition={{ duration: 0.3 }}
+  
+  className="space-y-10">
     <h1 className="text-4xl font-semibold"> 🔍 Review and submit</h1>
     <p className="text-xl font-light mt-4 leading-8">
       Review the details of your product and submit it to the world.
@@ -525,7 +720,7 @@ return (
                 </div>
               </div>
     </div>
-  </div>
+  </motion.div>
 )}
 
 
@@ -545,7 +740,7 @@ return (
       Go to your products
     </div>
 
-    {/* <Separator /> */}
+    <Separator />
 
     <div
       onClick={submitAnotherProduct}
@@ -575,7 +770,7 @@ return (
   <div className="flex">
     {step === 7 ? (
       <button
-        onClick={nextStep}
+        onClick={submitProduct}
         className="bg-[#ff6154] text-white py-2 px-4 rounded-md mt-4 items-end"
       >
         Submit
